@@ -23,11 +23,74 @@
        ============================================================ */
     .login-page {
       display: flex; align-items: center; justify-content: center;
-      min-height: 100vh; background: linear-gradient(135deg, #001529 0%, #003a70 100%);
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0a1628 0%, #132347 30%, #1a3a5c 60%, #0d2137 100%);
+      position: relative; overflow: hidden;
+    }
+    /* AI 神经网络背景粒子 */
+    .login-page::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        /* 网格线 - 科技感 */
+        linear-gradient(rgba(22,119,255,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(22,119,255,0.08) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse at 50% 50%, black 30%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 30%, transparent 70%);
+    }
+    /* AI 数据流线条 */
+    .login-page::after {
+      content: ''; position: absolute; inset: 0;
+      background:
+        /* 水平数据线 */
+        repeating-linear-gradient(90deg,
+          transparent, transparent 40px,
+          rgba(22,119,255,0.03) 40px, rgba(22,119,255,0.03) 41px),
+        /* 垂直扫描线 */
+        repeating-linear-gradient(0deg,
+          transparent, transparent 80px,
+          rgba(82,196,26,0.02) 80px, rgba(82,196,26,0.02) 81px);
+    }
+    /* 档案/文档装饰图标（纯CSS） */
+    .login-page .bg-decor {
+      position: absolute; pointer-events: none; opacity: 0.06;
+      font-size: 120px; color: #fff; user-select: none;
+    }
+    .login-page .bg-decor-1 { top: 8%; left: 5%; transform: rotate(-15deg); font-size: 100px; }
+    .login-page .bg-decor-2 { bottom: 10%; right: 3%; transform: rotate(10deg); font-size: 140px; }
+    .login-page .bg-decor-3 { top: 50%; right: 8%; font-size: 60px; opacity: 0.04; }
+    .login-page .bg-decor-4 { bottom: 30%; left: 2%; font-size: 80px; opacity: 0.04; transform: rotate(20deg); }
+    /* AI 节点圆点 */
+    .login-page .dot-grid {
+      position: absolute; width: 100%; height: 100%; pointer-events: none;
+    }
+    .login-page .dot-grid span {
+      position: absolute; width: 4px; height: 4px; border-radius: 50%;
+      background: rgba(22,119,255,0.2); animation: pulse 3s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.2; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.5); }
+    }
+    .login-page .glow-orb {
+      position: absolute; border-radius: 50%; pointer-events: none;
+      filter: blur(80px); opacity: 0.08;
+    }
+    .login-page .glow-orb-1 { width: 400px; height: 400px; top: -100px; right: -100px;
+      background: radial-gradient(circle, #1677ff, transparent); animation: float 8s ease-in-out infinite; }
+    .login-page .glow-orb-2 { width: 300px; height: 300px; bottom: -50px; left: -50px;
+      background: radial-gradient(circle, #52c41a, transparent); animation: float 10s ease-in-out infinite reverse; }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(30px, -30px); }
     }
     .login-box {
-      background: #fff; border-radius: 16px; padding: 48px 40px;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 16px; padding: 48px 40px;
       width: 420px; max-width: 90vw; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      position: relative; z-index: 1;
     }
     .login-box h1 {
       font-size: 24px; text-align: center; margin-bottom: 8px; color: #001529;
@@ -221,10 +284,29 @@
      登录页
      ============================================================ -->
 <div class="login-page" id="loginPage">
+  <!-- 背景装饰 -->
+  <div class="glow-orb glow-orb-1"></div>
+  <div class="glow-orb glow-orb-2"></div>
+  <div class="bg-decor bg-decor-1">📄</div>
+  <div class="bg-decor bg-decor-2">🤖</div>
+  <div class="bg-decor bg-decor-3">📊</div>
+  <div class="bg-decor bg-decor-4">🔐</div>
+  <div class="dot-grid">
+    <span style="top:15%;left:20%"></span>
+    <span style="top:25%;left:75%;animation-delay:0.5s"></span>
+    <span style="top:45%;left:10%;animation-delay:1s"></span>
+    <span style="top:60%;left:85%;animation-delay:1.5s"></span>
+    <span style="top:80%;left:30%;animation-delay:2s"></span>
+    <span style="top:10%;left:60%;animation-delay:2.5s"></span>
+    <span style="top:70%;left:55%;animation-delay:0.8s"></span>
+    <span style="top:35%;left:45%;animation-delay:1.8s"></span>
+  </div>
+
   <div class="login-box">
     <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%231677ff'/%3E%3Ctext x='24' y='32' text-anchor='middle' fill='%23fff' font-size='28' font-weight='bold'%3EA%3C/text%3E%3C/svg%3E" style="display:block;margin:0 auto 16px;">
     <h1>授权管理后台</h1>
     <p>连云港文安档案科技有限公司</p>
+    <p style="font-size:12px;color:#bfbfbf;margin:-8px 0 20px 0;">技术支持：183 5281 1015</p>
     <div class="form-group">
       <label>管理员账号</label>
       <input type="text" id="loginUser" placeholder="请输入账号">
