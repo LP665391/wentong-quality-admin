@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文安档案 · 授权管理后台</title>
+  <style>
+    /* ============================================================
+       全局
+       ============================================================ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #f0f2f5;
+      color: #333;
+      min-height: 100vh;
+    }
+    a { color: #1677ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ============================================================
+       登录页
+       ============================================================ */
+    .login-page {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; background: linear-gradient(135deg, #001529 0%, #003a70 100%);
+    }
+    .login-box {
+      background: #fff; border-radius: 16px; padding: 48px 40px;
+      width: 420px; max-width: 90vw; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .login-box h1 {
+      font-size: 24px; text-align: center; margin-bottom: 8px; color: #001529;
+    }
+    .login-box p {
+      text-align: center; color: #8c8c8c; font-size: 14px; margin-bottom: 32px;
+    }
+    .login-box .form-group { margin-bottom: 20px; }
+    .login-box label {
+      display: block; font-size: 14px; color: #333; margin-bottom: 6px; font-weight: 500;
+    }
+    .login-box input {
+      width: 100%; padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 8px;
+      font-size: 14px; outline: none; transition: border-color .2s;
+    }
+    .login-box input:focus { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.15); }
+    .login-box .btn {
+      width: 100%; padding: 12px; border: none; border-radius: 8px;
+      font-size: 16px; font-weight: 600; cursor: pointer;
+      background: #1677ff; color: #fff; transition: background .2s;
+    }
+    .login-box .btn:hover { background: #4096ff; }
+.login-box .login-error {
+  color: #f56c6c; font-size: 13px; margin-top: 12px; text-align: center; display: none;
+}
+
+/* 滑动验证码 */
+.captcha-wrap {
+  position: relative; width: 100%; height: 48px; margin-bottom: 8px;
+  background: #f5f5f5; border-radius: 8px; overflow: hidden; border: 1px solid #e8e8e8;
+  user-select: none;
+}
+.captcha-image {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  overflow: hidden; background: #fafafa; pointer-events: none;
+}
+.captcha-track {
+  position: absolute; top: 0; left: 0; height: 100%;
+  background: rgba(22,119,255,0.15); border-radius: 8px; width: 0;
+  pointer-events: none; transition: none;
+}
+.captcha-slider {
+  position: absolute; top: 2px; left: 0; width: 44px; height: 44px;
+  background: #fff; border: 1px solid #1677ff; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: grab; font-size: 18px; color: #1677ff; z-index: 2;
+  box-shadow: 0 2px 4px rgba(22,119,255,0.2); transition: box-shadow .2s;
+}
+.captcha-slider:hover { box-shadow: 0 2px 8px rgba(22,119,255,0.3); }
+.captcha-slider.success { background: #52c41a; border-color: #52c41a; color: #fff; cursor: default; }
+.captcha-hint {
+  position: absolute; left: 56px; top: 50%; transform: translateY(-50%);
+  font-size: 13px; color: #8c8c8c; pointer-events: none; white-space: nowrap;
+}
+
+    /* ============================================================
+       主界面
+       ============================================================ */
+    .app { display: none; }
+    .app-header {
+      background: #001529; color: #fff; padding: 0 24px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .app-header h1 { font-size: 18px; font-weight: 600; }
+    .app-header h1 span { color: #1677ff; }
+    .app-header .user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    .app-header .user-info button {
+      padding: 6px 16px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px;
+      background: transparent; color: #fff; cursor: pointer; font-size: 13px;
+    }
+    .app-header .user-info button:hover { border-color: #fff; }
+
+    .app-body { display: flex; min-height: calc(100vh - 56px); }
+
+    /* -- 侧边栏 -- */
+    .sidebar {
+      width: 220px; background: #fff; border-right: 1px solid #e8e8e8; padding: 16px 0;
+    }
+    .sidebar .menu-item {
+      padding: 12px 24px; cursor: pointer; font-size: 14px; color: #333;
+      display: flex; align-items: center; gap: 10px; transition: all .2s;
+    }
+    .sidebar .menu-item:hover { background: #f5f5f5; color: #1677ff; }
+    .sidebar .menu-item.active { background: #e6f4ff; color: #1677ff; font-weight: 600; border-right: 3px solid #1677ff; }
+
+    /* -- 主内容 -- */
+    .main-content { flex: 1; padding: 24px; overflow-y: auto; }
+    .page-title { font-size: 20px; font-weight: 600; margin-bottom: 24px; color: #262626; }
+    .page-title small { font-size: 14px; font-weight: 400; color: #8c8c8c; margin-left: 8px; }
+
+    /* 统计卡片 */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card {
+      background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .stat-card .num { font-size: 28px; font-weight: 700; color: #1677ff; }
+    .stat-card .num.green { color: #52c41a; }
+    .stat-card .num.orange { color: #fa8c16; }
+.stat-card .num.blue { color: #1677ff; }
+.stat-card .num.purple { color: #722ed1; }
+    .stat-card .label { font-size: 13px; color: #8c8c8c; margin-top: 4px; }
+
+    /* 表单卡片 */
+    .card {
+      background: #fff; border-radius: 12px; padding: 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 24px;
+    }
+    .card h3 { font-size: 16px; margin-bottom: 20px; color: #262626; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .form-group label { display: block; font-size: 13px; color: #595959; margin-bottom: 6px; font-weight: 500; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 6px;
+      font-size: 14px; outline: none; transition: border-color .2s;
+    }
+    .form-group input:focus { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+    .form-group input[readonly] { background: #f5f5f5; color: #8c8c8c; }
+    .form-group .hint { font-size: 12px; color: #8c8c8c; margin-top: 4px; }
+    .btn {
+      padding: 8px 24px; border: none; border-radius: 6px; font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: all .2s;
+    }
+    .btn-primary { background: #1677ff; color: #fff; }
+    .btn-primary:hover { background: #4096ff; }
+    .btn-success { background: #52c41a; color: #fff; }
+    .btn-success:hover { background: #73d13d; }
+    .btn-danger { background: #ff4d4f; color: #fff; }
+    .btn-danger:hover { background: #ff7875; }
+    .btn-sm { padding: 4px 12px; font-size: 12px; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* 表格 */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+    }
+    th {
+      background: #fafafa; padding: 12px 16px; text-align: left;
+      font-weight: 600; color: #595959; border-bottom: 1px solid #e8e8e8;
+      white-space: nowrap;
+    }
+    td {
+      padding: 10px 16px; border-bottom: 1px solid #f0f0f0; color: #333;
+    }
+    tr:hover td { background: #fafafa; }
+    .tag {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-size: 12px; font-weight: 500;
+    }
+    .tag-green { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+    .tag-orange { background: #fff7e6; color: #fa8c16; border: 1px solid #ffd591; }
+    .tag-blue { background: #e6f4ff; color: #1677ff; border: 1px solid #91caff; }
+    .empty-state {
+      text-align: center; padding: 48px; color: #8c8c8c; font-size: 14px;
+    }
+
+    /* 提示消息 */
+    .toast {
+      position: fixed; top: 20px; right: 20px; z-index: 9999;
+      padding: 12px 20px; border-radius: 8px; font-size: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: none; animation: slideIn .3s ease;
+    }
+    .toast.success { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+    .toast.error { background: #fff2f0; color: #ff4d4f; border: 1px solid #ffccc7; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* 搜索栏 */
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .toolbar .search-box { display: flex; gap: 8px; align-items: center; }
+    .toolbar .search-box input {
+      padding: 6px 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; outline: none; width: 240px;
+    }
+    .toolbar .search-box input:focus { border-color: #1677ff; }
+
+    .hidden { display: none !important; }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .app-body { flex-direction: column; }
+      .sidebar { width: 100%; display: flex; overflow-x: auto; padding: 8px 0; }
+      .sidebar .menu-item { white-space: nowrap; padding: 8px 16px; }
+      .stats { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     登录页
+     ============================================================ -->
+<div class="login-page" id="loginPage">
+  <div class="login-box">
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%231677ff'/%3E%3Ctext x='24' y='32' text-anchor='middle' fill='%23fff' font-size='28' font-weight='bold'%3EA%3C/text%3E%3C/svg%3E" style="display:block;margin:0 auto 16px;">
+    <h1>授权管理后台</h1>
+    <p>连云港文安档案科技有限公司</p>
+    <div class="form-group">
+      <label>管理员账号</label>
+      <input type="text" id="loginUser" placeholder="请输入账号">
+    </div>
+    <div class="form-group">
+      <label>密码</label>
+      <div style="position:relative;">
+        <input type="password" id="loginPass" placeholder="请输入密码" onkeydown="if(event.key==='Enter')handleLogin()" style="padding-right:40px;">
+        <span onclick="togglePass()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#999;font-size:16px;user-select:none;" id="passToggle">👁️</span>
+      </div>
+    </div>
+    <div class="captcha-wrap" id="captchaContainer">
+      <div class="captcha-track" id="captchaTrack"></div>
+      <div class="captcha-slider" id="captchaSlider" onmousedown="initSlider(event)" ontouchstart="initSlider(event)">→</div>
+      <span class="captcha-hint" id="captchaHint">→ 拖动滑块到右侧验证</span>
+    </div>
+    <button class="btn" id="loginBtn" onclick="handleLogin()" disabled>请完成验证后登录</button>
+    <div class="login-error" id="loginError">账号或密码错误</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     主应用
+     ============================================================ -->
+<div class="app" id="app">
+  <!-- 头部 -->
+  <header class="app-header">
+    <h1>文安档案 · <span>授权管理</span></h1>
+    <div class="user-info">
+      <span id="currentUser">admin</span>
+      <button onclick="handleLogout()">退出</button>
+    </div>
+  </header>
+
+  <div class="app-body">
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+      <div class="menu-item active" data-page="dashboard" onclick="switchPage('dashboard')">
+        📊 总览
+      </div>
+      <div class="menu-item" data-page="generate" onclick="switchPage('generate')">
+        📜 许可证管理
+      </div>
+      <div class="menu-item" data-page="authcodes" onclick="switchPage('authcodes')">
+        🔑 授权码管理
+      </div>
+      <div class="menu-item" data-page="history" onclick="switchPage('history')">
+        📜 历史记录
+      </div>
+      <div class="menu-item" data-page="members" onclick="switchPage('members')">
+        👥 成员管理
+      </div>
+      <div class="menu-item" data-page="about" onclick="switchPage('about')" id="aboutMenu" style="display:none;">
+        ℹ️ 关于
+      </div>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+
+      <!-- ===== 总览页 ===== -->
+      <div id="page-dashboard">
+        <h2 class="page-title">总览</h2>
+        <div class="stats" style="grid-template-columns: repeat(5, 1fr);">
+          <div class="stat-card">
+            <div class="num" id="totalLicenses">0</div>
+            <div class="label">许可证总数</div>
+          </div>
+          <div class="stat-card">
+            <div class="num green" id="activeLicenses">0</div>
+            <div class="label">有效授权</div>
+          </div>
+          <div class="stat-card">
+            <div class="num orange" id="expiredLicenses">0</div>
+            <div class="label">已过期</div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="monthlyNew">0</div>
+            <div class="label">本月新增</div>
+          </div>
+          <div class="stat-card">
+            <div class="num blue" id="totalCustomers">0</div>
+            <div class="label">客户数</div>
+          </div>
+          <div class="stat-card">
+            <div class="num green" id="totalOrders">0</div>
+            <div class="label">订单数</div>
+          </div>
+          <div class="stat-card">
+            <div class="num blue" id="unusedCodes">0</div>
+            <div class="label">可用授权码</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+          <div class="card" style="margin-bottom:0;">
+            <h3>📋 最近许可证</h3>
+            <div id="recentList"><div class="empty-state">暂无记录</div></div>
+          </div>
+          <div class="card" style="margin-bottom:0;">
+            <h3>⏰ 即将过期（30天内）</h3>
+            <div id="expiringList"><div class="empty-state">暂无即将过期的许可证</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📈 销售额趋势（近12个月）</h3>
+          <div id="revenueChart" style="height:80px;display:flex;align-items:flex-end;gap:6px;padding-top:8px;">
+            <div class="empty-state" style="padding:16px;">暂无数据</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 生成许可证页 ===== -->
+      <div id="page-generate" class="hidden">
+        <h2 class="page-title">生成许可证</h2>
+        <div class="card">
+          <h3>填写许可证信息</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>机器码 <span style="color:#f56c6c">*</span></label>
+              <input type="text" id="genMachineId" placeholder="格式：XXXX-XXXX-...（32位）">
+              <div class="hint">用户桌面端「离线激活」页面可复制</div>
+            </div>
+            <div class="form-group">
+              <label>客户名称 <span style="color:#f56c6c">*</span></label>
+              <input type="text" id="genCustomer" placeholder="如：刘婷">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>公司名称</label>
+              <input type="text" id="genCompany" placeholder="如：连云港文安档案科技有限公司">
+            </div>
+            <div class="form-group">
+              <label>许可证类型</label>
+              <select id="genType">
+                <option value="permanent">永久授权</option>
+                <option value="trial">临时授权（按天）</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row" id="expiryRow">
+            <div class="form-group">
+              <label>过期日期</label>
+              <input type="date" id="genExpiry">
+            </div>
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <div></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;">
+            <button class="btn btn-primary" onclick="generateLicense()">生成并下载 .dat 许可证</button>
+            <button class="btn" style="border:1px solid #d9d9d9;background:#fff;color:#333;" onclick="clearForm()">清空</button>
+          </div>
+        </div>
+
+        <!-- 生成结果预览 -->
+        <div id="previewArea" class="card hidden">
+          <h3>✅ 许可证已生成</h3>
+          <div class="form-row form-row-3">
+            <div class="form-group">
+              <label>授权码</label>
+              <input type="text" id="previewLicenseId" readonly>
+            </div>
+            <div class="form-group">
+              <label>客户</label>
+              <input type="text" id="previewCustomer" readonly>
+            </div>
+            <div class="form-group">
+              <label>类型</label>
+              <input type="text" id="previewType" readonly>
+            </div>
+          </div>
+          <div class="form-row form-row-3">
+            <div class="form-group">
+              <label>机器码</label>
+              <input type="text" id="previewMachineId" readonly style="font-size:12px">
+            </div>
+            <div class="form-group">
+              <label>颁发日期</label>
+              <input type="text" id="previewDate" readonly>
+            </div>
+            <div class="form-group">
+              <label>过期日期</label>
+              <input type="text" id="previewExpiry" readonly>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;">
+            <button class="btn btn-success" onclick="downloadLicense()">📥 下载 .dat 文件</button>
+            <button class="btn" style="border:1px solid #d9d9d9;background:#fff;color:#333;" onclick="copyLicenseData()">📋 复制许可证内容</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 关于页 ===== -->
+      <div id="page-about" class="hidden">
+        <h2 class="page-title">关于</h2>
+        <div class="card">
+          <h3>文安档案 · 授权管理系统</h3>
+          <p style="color:#595959;line-height:2;margin-bottom:12px;">
+            版本：v1.0.0<br>
+            开发：连云港文安档案科技有限公司<br>
+            用途：为 Ai质检平台 桌面端生成离线许可证文件<br>
+            签名算法：HMAC-SHA256<br>
+          </p>
+          <div style="background:#f6ffed;border:1px solid #b7eb8f;border-radius:8px;padding:12px 16px;margin-bottom:16px;">
+            <strong style="color:#52c41a;">🔑 超级管理员</strong><br>
+            <span style="color:#595959;font-size:14px;">
+              账号：<code style="background:#f0f0f0;padding:2px 8px;border-radius:4px;">admin</code><br>
+              密码：<code id="adminPasswordDisplay" style="background:#f0f0f0;padding:2px 8px;border-radius:4px;">加载中...</code>
+            </span>
+          </div>
+          <div class="form-group">
+            <label>管理员密码修改</label>
+            <div style="display:flex;gap:8px;">
+              <input type="password" id="newPass" placeholder="新密码" style="width:200px">
+              <button class="btn btn-sm btn-primary" onclick="changePassword()">修改密码</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 授权记录表（合并到许可证管理页） -->
+        <div class="card" style="margin-top:16px;">
+          <div class="toolbar">
+            <h3 style="margin:0;font-size:16px;">📋 授权记录</h3>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="text" id="searchInput" placeholder="搜索客户名/机器码..." oninput="renderRecords()" style="padding:6px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:13px;outline:none;width:200px;">
+              <button class="btn btn-sm btn-danger" onclick="clearAllRecords()" id="clearAllBtn" style="display:none;">清空所有</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>授权码</th>
+                  <th>客户</th>
+                  <th>公司</th>
+                  <th>类型</th>
+                  <th>机器码</th>
+                  <th>颁发日期</th>
+                  <th>过期日期</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="recordsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 授权码管理页 ===== -->
+      <div id="page-authcodes" class="hidden">
+        <h2 class="page-title">🔑 授权码管理</h2>
+        <div class="card">
+          <h3>创建授权码（客户用于在线激活）</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>客户名称 <span style="color:#f56c6c">*</span></label>
+              <input type="text" id="acCustomer" placeholder="如：刘婷">
+            </div>
+            <div class="form-group">
+              <label>公司名称</label>
+              <input type="text" id="acCompany" placeholder="如：文安档案">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>套餐</label>
+              <select id="acPlan">
+                <option value="basic">基础版</option>
+                <option value="pro" selected>专业版</option>
+                <option value="enterprise">企业版</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>生成数量</label>
+              <input type="number" id="acCount" value="1" min="1" max="500">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="createAuthCodes()">批量生成授权码</button>
+        </div>
+        <div class="card">
+          <h3>授权码列表</h3>
+          <div class="toolbar">
+            <div class="search-box">
+              <input type="text" id="acSearch" placeholder="搜索授权码/客户..." oninput="loadAuthCodes()">
+              <select id="acFilter" onchange="loadAuthCodes()" style="padding:6px 8px;border:1px solid #d9d9d9;border-radius:6px;font-size:13px;">
+                <option value="all">全部</option>
+                <option value="unused">未使用</option>
+                <option value="used">已使用</option>
+              </select>
+            </div>
+            <span style="font-size:13px;color:#8c8c8c;" id="acStats"></span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>授权码</th><th>客户</th><th>套餐</th><th>状态</th><th>绑定机器</th><th>激活时间</th><th>创建时间</th><th>操作</th></tr></thead>
+              <tbody id="acBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 历史记录页 ===== -->
+      <div id="page-history" class="hidden">
+        <h2 class="page-title">📜 历史记录</h2>
+        <div class="card">
+          <div class="toolbar">
+            <div class="search-box">
+              <input type="text" id="historySearch" placeholder="搜索操作内容..." oninput="loadHistory()">
+              <button class="btn btn-sm btn-primary" onclick="loadHistory()">搜索</button>
+            </div>
+            <span style="font-size:13px;color:#8c8c8c;" id="historyStats"></span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>操作</th>
+                  <th>详情</th>
+                  <th>操作人</th>
+                </tr>
+              </thead>
+              <tbody id="historyBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 成员管理页 ===== -->
+      <div id="page-members" class="hidden">
+        <h2 class="page-title">👥 成员管理</h2>
+        <div class="card">
+          <h3>添加成员</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>账号 <span style="color:#f56c6c">*</span></label>
+              <input type="text" id="memUser" placeholder="登录账号">
+            </div>
+            <div class="form-group">
+              <label>姓名</label>
+              <input type="text" id="memName" placeholder="显示名称">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>密码 <span style="color:#f56c6c">*</span></label>
+              <div style="position:relative;">
+                <input type="password" id="memPass" placeholder="至少6位" style="padding-right:40px;">
+                <span onclick="toggleMemPass()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#999;font-size:16px;user-select:none;" id="memPassToggle">👁️</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>角色</label>
+              <select id="memRole">
+                <option value="admin">管理员</option>
+                <option value="super" id="superRoleOpt" style="display:none;">超级管理员</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="addMember()">添加成员</button>
+        </div>
+        <div class="card">
+          <h3>成员列表</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>账号</th><th>姓名</th><th>角色</th><th>密码</th><th>创建时间</th><th>操作</th></tr></thead>
+              <tbody id="memBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ================================================================
+// 配置
+// ================================================================
+const CONFIG = {
+  // ⚠️ 必须与桌面端 crypto.ts 中的密钥一致！
+  SECRET_KEY: 'V2VuVG9uZ1F1YWxpdHlQbGF0Zm9ybVNlY3JldEtleTIwMjU=',
+};
+
+// ================================================================
+// 滑块验证（简单拖动到最右侧即可）
+// ================================================================
+let isCaptchaVerified = false;
+
+function initSlider(e) {
+  e.preventDefault();
+  const wrap = document.getElementById('captchaContainer');
+  const slider = document.getElementById('captchaSlider');
+  const track = document.getElementById('captchaTrack');
+  const hint = document.getElementById('captchaHint');
+  if (!wrap || !slider) return;
+  const maxLeft = wrap.offsetWidth - slider.offsetWidth - 4;
+  const startX = e.clientX || e.touches[0].clientX;
+  const startLeft = parseInt(slider.style.left) || 0;
+
+  function onMove(ev) {
+    const cx = ev.clientX || ev.touches[0].clientX;
+    let nl = Math.max(0, Math.min(maxLeft, startLeft + cx - startX));
+    slider.style.left = nl + 'px';
+    track.style.width = (nl + 22) + 'px';
+  }
+  function onUp() {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onUp);
+    const pos = parseInt(slider.style.left) || 0;
+    if (pos >= maxLeft - 5) {
+      isCaptchaVerified = true;
+      slider.style.left = maxLeft + 'px';
+      track.style.width = '100%';
+      slider.textContent = '✓';
+      slider.classList.add('success');
+      hint.textContent = '✓ 验证通过';
+      hint.style.color = '#52c41a';
+      document.getElementById('loginBtn').disabled = false;
+      document.getElementById('loginBtn').textContent = '登 录';
+    } else {
+      slider.style.left = '0px';
+      track.style.width = '0px';
+    }
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+  document.addEventListener('touchmove', onMove, { passive: true });
+  document.addEventListener('touchend', onUp);
+}
+
+// ================================================================
+// 登录
+// ================================================================
+function handleLogin() {
+  if (!isCaptchaVerified) {
+    document.getElementById('loginError').textContent = '请先拖动滑块验证';
+    document.getElementById('loginError').style.display = 'block';
+    return;
+  }
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+
+  fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: user, password: pass }),
+  }).then(r => r.json()).then(data => {
+    if (data.success) {
+      window.AUTH_TOKEN = data.token;
+      localStorage.setItem('auth_token', data.token);
+      localStorage.setItem('auth_user', user);
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      document.getElementById('currentUser').textContent = user;
+      // 仅 admin 显示"关于"菜单
+      document.getElementById('aboutMenu').style.display = user === 'admin' ? '' : 'none';
+      refreshDashboard();
+      renderRecords();
+    } else {
+      document.getElementById('loginError').textContent = data.error || '登录失败';
+      document.getElementById('loginError').style.display = 'block';
+      loadCaptcha();
+    }
+  }).catch(() => {
+    document.getElementById('loginError').textContent = '网络请求失败';
+    document.getElementById('loginError').style.display = 'block';
+  });
+}
+
+function handleLogout() {
+  window.AUTH_TOKEN = null;
+  localStorage.removeItem('auth_token');
+  localStorage.removeItem('auth_user');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('loginError').style.display = 'none';
+  // 重置滑块
+  isCaptchaVerified = false;
+  const slider = document.getElementById('captchaSlider');
+  const track = document.getElementById('captchaTrack');
+  const hint = document.getElementById('captchaHint');
+  if (slider) { slider.style.left = '0px'; slider.textContent = '→'; slider.classList.remove('success'); }
+  if (track) track.style.width = '0px';
+  if (hint) { hint.textContent = '→ 拖动滑块到右侧验证'; hint.style.color = '#8c8c8c'; }
+  document.getElementById('loginBtn').disabled = true;
+  document.getElementById('loginBtn').textContent = '请完成验证后登录';
+}
+
+// API 请求工具（自动携带 token）
+async function apiCall(url, options = {}) {
+  const headers = { 'Content-Type': 'application/json', ...options.headers };
+  if (window.AUTH_TOKEN) headers['Authorization'] = 'Bearer ' + window.AUTH_TOKEN;
+  const res = await fetch(url, { ...options, headers });
+  return res.json();
+}
+
+function togglePass() {
+  const inp = document.getElementById('loginPass');
+  const btn = document.getElementById('passToggle');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁️' : '🙈';
+}
+
+function toggleMemPass() {
+  const inp = document.getElementById('memPass');
+  const btn = document.getElementById('memPassToggle');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁️' : '🙈';
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => showToast('已复制: ' + text, 'success')).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    showToast('已复制', 'success');
+  });
+}
+
+function changePassword() {
+  const newPass = document.getElementById('newPass').value.trim();
+  if (!newPass || newPass.length < 6) return showToast('密码至少6位', 'error');
+  // 实际应调 API，简化处理：直接本地存储
+  localStorage.setItem('admin_pass', newPass);
+  document.getElementById('newPass').value = '';
+  showToast('密码已修改', 'success');
+}
+
+// ================================================================
+// 总览
+// ================================================================
+async function refreshDashboard() {
+  try {
+    const data = await apiCall('/api/stats');
+    if (!data.success || !data.data) return fallbackDashboard();
+
+    const d = data.data;
+    document.getElementById('totalLicenses').textContent = d.licenses.total;
+    document.getElementById('activeLicenses').textContent = d.licenses.active;
+    document.getElementById('expiredLicenses').textContent = d.licenses.expired;
+    document.getElementById('monthlyNew').textContent = d.licenses.monthlyNew;
+    document.getElementById('totalCustomers').textContent = d.customers.total;
+    document.getElementById('totalOrders').textContent = d.finance.totalOrders;
+    document.getElementById('unusedCodes').textContent = d.codes.unused;
+
+    // 最近许可证
+    const recent = d.licenses.recent || [];
+    const rContainer = document.getElementById('recentList');
+    if (recent.length === 0) {
+      rContainer.innerHTML = '<div class="empty-state">暂无记录</div>';
+    } else {
+      rContainer.innerHTML = '<div class="table-wrap"><table><thead><tr><th>客户</th><th>授权码</th><th>类型</th><th>日期</th></tr></thead><tbody>' +
+        recent.map(r => `<tr>
+          <td>${r.customerName || '-'}</td>
+          <td style="font-family:monospace;font-size:11px;">${r.licenseId}</td>
+          <td><span class="tag ${r.type === 'permanent' ? 'tag-green' : 'tag-orange'}">${r.type === 'permanent' ? '永久' : '临时'}</span></td>
+          <td>${r.issueDate || '-'}</td>
+        </tr>`).join('') + '</tbody></table></div>';
+    }
+
+    // 即将过期
+    const expiring = d.expiringSoon || [];
+    const eContainer = document.getElementById('expiringList');
+    if (expiring.length === 0) {
+      eContainer.innerHTML = '<div class="empty-state">暂无即将过期的许可证</div>';
+    } else {
+      eContainer.innerHTML = '<div class="table-wrap"><table><thead><tr><th>客户</th><th>授权码</th><th>过期时间</th><th>剩余</th></tr></thead><tbody>' +
+        expiring.map(r => `<tr>
+          <td>${r.customerName || '-'}</td>
+          <td style="font-family:monospace;font-size:11px;">${r.licenseId}</td>
+          <td>${r.expireDate || '-'}</td>
+          <td><span class="tag ${r.daysLeft <= 7 ? 'tag-orange' : 'tag-blue'}">${r.daysLeft}天</span></td>
+        </tr>`).join('') + '</tbody></table></div>';
+    }
+
+    // 销售额趋势
+    const trend = d.revenueTrend || [];
+    const chart = document.getElementById('revenueChart');
+    if (trend.length === 0) {
+      chart.innerHTML = '<div class="empty-state" style="padding:16px;">暂无数据</div>';
+    } else {
+      const max = Math.max(...trend.map(t => t.amount), 1);
+      chart.innerHTML = trend.map(t => {
+        const h = Math.max(4, (t.amount / max) * 70);
+        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+          <div style="width:100%;background:#1677ff;border-radius:4px 4px 0 0;height:${h}px;transition:height .3s;min-height:4px;" title="¥${t.amount}"></div>
+          <span style="font-size:9px;color:#999;transform:rotate(-45deg);white-space:nowrap;">${t.month.slice(5)}</span>
+        </div>`;
+      }).join('');
+    }
+  } catch {
+    fallbackDashboard();
+  }
+}
+
+function fallbackDashboard() {
+  const records = getRecords();
+  const now = new Date();
+  document.getElementById('totalLicenses').textContent = records.length;
+  document.getElementById('activeLicenses').textContent = records.filter(r => !r.expireDate || new Date(r.expireDate) >= now).length;
+  document.getElementById('expiredLicenses').textContent = records.filter(r => r.expireDate && new Date(r.expireDate) < now).length;
+}
+
+// ================================================================
+// 生成许可证（HMAC-SHA256 + 下载）
+// ================================================================
+async function generateLicense() {
+  const customerName = document.getElementById('genCustomer').value.trim();
+  const company = document.getElementById('genCompany').value.trim();
+  const machineId = document.getElementById('genMachineId').value.trim();
+  const type = document.getElementById('genType').value;
+  const expireDate = document.getElementById('genExpiry').value;
+
+  if (!customerName) return showToast('请输入客户名称', 'error');
+  if (!machineId) return showToast('请输入机器码', 'error');
+  if (type === 'trial' && !expireDate) return showToast('临时授权请选择过期日期', 'error');
+
+  // 生成授权码
+  const ts = Date.now().toString(36).toUpperCase();
+  const rand = Array.from(crypto.getRandomValues(new Uint8Array(4)), b => b.toString(16).toUpperCase().padStart(2, '0')).join('');
+  const licenseId = `WT-${ts}-${rand}`;
+
+  // 生成许可证内容
+  const content = {
+    licenseId,
+    customerName,
+    company: company || '',
+    type,
+    machineId,
+    issueDate: new Date().toISOString().split('T')[0],
+  };
+  if (type === 'trial' && expireDate) {
+    content.expireDate = expireDate;
+  }
+
+  // HMAC-SHA256 签名
+  const key = await crypto.subtle.importKey(
+    'raw',
+    Uint8Array.from(atob(CONFIG.SECRET_KEY), c => c.charCodeAt(0)),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false, ['sign']
+  );
+  const sigBytes = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(JSON.stringify(content)));
+  const signature = btoa(String.fromCharCode(...new Uint8Array(sigBytes)));
+
+  // 保存到后端
+  try {
+    await apiCall('/api/licenses', {
+      method: 'POST',
+      body: JSON.stringify({
+        customerName, company, machineId, type: type || 'permanent',
+        expireDate: type === 'trial' ? expireDate : undefined,
+      }),
+    });
+  } catch {}
+
+  // 存入本地记录
+  currentLicenseData = { content, signature };
+  addRecord(content);
+
+  // 预览
+  document.getElementById('previewLicenseId').value = licenseId;
+  document.getElementById('previewCustomer').value = customerName;
+  document.getElementById('previewType').value = type === 'permanent' ? '永久授权' : `临时（至${expireDate}）`;
+  document.getElementById('previewMachineId').value = machineId;
+  document.getElementById('previewDate').value = content.issueDate;
+  document.getElementById('previewExpiry').value = expireDate || '永久有效';
+  document.getElementById('previewArea').classList.remove('hidden');
+
+  showToast(`许可证已生成：${licenseId}`, 'success');
+  refreshDashboard();
+}
+
+function downloadLicense() {
+  if (!currentLicenseData) return;
+  const json = JSON.stringify(currentLicenseData, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `license-${currentLicenseData.content.customerName}-${currentLicenseData.content.machineId.slice(0, 8)}.dat`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('文件已下载', 'success');
+}
+
+function copyLicenseData() {
+  if (!currentLicenseData) return;
+  navigator.clipboard.writeText(JSON.stringify(currentLicenseData, null, 2));
+  showToast('已复制到剪贴板', 'success');
+}
+
+function clearForm() {
+  document.getElementById('genCustomer').value = '';
+  document.getElementById('genCompany').value = '';
+  document.getElementById('genMachineId').value = '';
+  document.getElementById('genType').value = 'permanent';
+  document.getElementById('genExpiry').value = '';
+  document.getElementById('previewArea').classList.add('hidden');
+  currentLicenseData = null;
+}
+
+// 类型切换显示过期日期
+document.getElementById('genType').addEventListener('change', function() {
+  document.getElementById('expiryRow').style.display = this.value === 'trial' ? '' : 'none';
+});
+
+// ================================================================
+// 授权记录管理（localStorage）
+// ================================================================
+function getRecords() {
+  try {
+    return JSON.parse(localStorage.getItem('license_records') || '[]');
+  } catch { return []; }
+}
+
+function saveRecords(records) {
+  localStorage.setItem('license_records', JSON.stringify(records));
+}
+
+function addRecord(content) {
+  const records = getRecords();
+  records.push(content);
+  saveRecords(records);
+}
+
+function deleteRecord(index) {
+  const records = getRecords();
+  records.splice(index, 1);
+  saveRecords(records);
+  renderRecords();
+  refreshDashboard();
+}
+
+function clearAllRecords() {
+  if (!confirm('确定清空所有授权记录？此操作不可恢复。')) return;
+  saveRecords([]);
+  renderRecords();
+  refreshDashboard();
+  showToast('已清空所有记录', 'success');
+}
+
+async function renderRecords() {
+  const isSuper = document.getElementById('currentUser').textContent === 'admin';
+  document.getElementById('clearAllBtn').style.display = isSuper ? '' : 'none';
+
+  // 先从 API 获取服务端记录
+  let apiRecords = [];
+  try {
+    const data = await apiCall('/api/licenses');
+    if (data.success) apiRecords = data.data || [];
+  } catch {}
+
+  // 合并本地记录
+  let records = apiRecords;
+  const localRecords = getRecords();
+  // 将本地有但API没有的记录补进去
+  for (const lr of localRecords) {
+    if (!records.find(r => r.licenseId === lr.licenseId)) {
+      records.push(lr);
+    }
+  }
+
+  const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+  const filtered = keyword ? records.filter(r =>
+    r.customerName?.toLowerCase().includes(keyword) ||
+    r.machineId?.toLowerCase().includes(keyword) ||
+    r.licenseId?.toLowerCase().includes(keyword)
+  ) : records;
+
+  const tbody = document.getElementById('recordsBody');
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state">暂无记录</div></td></tr>';
+    return;
+  }
+
+  const now = new Date();
+  tbody.innerHTML = filtered.map((r, i) => {
+    const isExpired = r.expireDate && new Date(r.expireDate) < now;
+    return `<tr>
+      <td style="font-family:monospace;font-size:12px;">${r.licenseId}</td>
+      <td>${r.customerName}</td>
+      <td>${r.company || '-'}</td>
+      <td><span class="tag ${r.type === 'permanent' ? 'tag-green' : isExpired ? 'tag-orange' : 'tag-blue'}">${r.type === 'permanent' ? '永久' : isExpired ? '已过期' : '临时'}</span></td>
+      <td style="font-family:monospace;font-size:11px;">${r.machineId}</td>
+      <td>${r.issueDate || '-'}</td>
+      <td>${r.expireDate || '永久'}</td>
+      <td>${isSuper ? `<button class="btn btn-sm btn-danger" onclick="deleteRecord(${records.indexOf(r)})">删除</button>` : '-'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ================================================================
+// Toast 提示
+// ================================================================
+function showToast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + type;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 3000);
+}
+
+// ================================================================
+// 初始化
+// ================================================================
+// 显示登录页
+document.getElementById('loginPage').style.display = 'flex';
+document.getElementById('expiryRow').style.display = 'none';
+
+// 页面加载时检查登录状态
+const savedToken = localStorage.getItem('auth_token');
+const savedUser = localStorage.getItem('auth_user');
+async function tryAutoLogin() {
+  if (!savedToken || !savedUser) return;
+  // 验证 token 是否有效
+  try {
+    const res = await fetch('/api/stats', {
+      headers: { 'Authorization': 'Bearer ' + savedToken }
+    });
+    if (!res.ok) throw new Error('token invalid');
+    const data = await res.json();
+    if (!data.success) throw new Error('token invalid');
+  } catch {
+    // Token 失效，清除并显示登录页
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
+    return;
+  }
+  window.AUTH_TOKEN = savedToken;
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('currentUser').textContent = savedUser;
+  document.getElementById('aboutMenu').style.display = savedUser === 'admin' ? '' : 'none';
+  refreshDashboard();
+  renderRecords();
+}
+tryAutoLogin();
+
+// 回车登录
+document.getElementById('loginPass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleLogin();
+});
+
+// ================================================================
+// 授权码管理
+// ================================================================
+function switchPage(name) {
+  document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.menu-item[data-page="${name}"]`).classList.add('active');
+  document.querySelectorAll('.main-content > div[id^="page-"]').forEach(el => el.classList.add('hidden'));
+  document.getElementById(`page-${name}`).classList.remove('hidden');
+  if (name === 'dashboard') refreshDashboard();
+  if (name === 'generate') { renderRecords(); }
+  if (name === 'authcodes') loadAuthCodes();
+  if (name === 'members') loadMembers();
+  if (name === 'history') loadHistory();
+  if (name === 'about') loadAdminPassword();
+}
+
+async function createAuthCodes() {
+  const customer = document.getElementById('acCustomer').value.trim();
+  const company = document.getElementById('acCompany').value.trim();
+  const plan = document.getElementById('acPlan').value;
+  const count = parseInt(document.getElementById('acCount').value) || 1;
+  if (!customer) return showToast('请输入客户名称', 'error');
+  const data = await apiCall('/api/auth-codes', {
+    method: 'POST',
+    body: JSON.stringify({ customerName: customer, company, planId: plan, count }),
+  });
+  if (data.success) {
+    showToast(`已生成 ${data.count} 个授权码`, 'success');
+    loadAuthCodes();
+  } else showToast(data.error || '生成失败', 'error');
+}
+
+async function loadAuthCodes() {
+  const isSuper = document.getElementById('currentUser').textContent === 'admin';
+  const search = document.getElementById('acSearch').value;
+  const filter = document.getElementById('acFilter').value;
+  let url = '/api/auth-codes';
+  const params = [];
+  if (search) params.push('search=' + encodeURIComponent(search));
+  if (filter === 'used') params.push('used=true');
+  if (filter === 'unused') params.push('used=false');
+  if (params.length) url += '?' + params.join('&');
+
+  const data = await apiCall(url);
+  if (!data.success) return;
+  const codes = data.data || [];
+  const tbody = document.getElementById('acBody');
+  const total = codes.length;
+  const used = codes.filter(c => c.used).length;
+
+  document.getElementById('acStats').textContent = `共 ${total} 个，已使用 ${used} 个`;
+
+  tbody.innerHTML = codes.map(c => `<tr>
+    <td><span style="font-family:monospace;font-size:12px;cursor:pointer;color:#1677ff;" onclick="copyText('${c.code}')" title="点击复制">${c.code || '-'}</span></td>
+    <td>${c.customerName || '-'}</td>
+    <td>${c.planId || '-'}</td>
+    <td><span class="tag ${c.used ? 'tag-orange' : 'tag-green'}">${c.used ? '已使用' : '未使用'}</span></td>
+    <td style="font-family:monospace;font-size:11px;">${c.boundMachineId || '-'}</td>
+    <td>${c.activatedAt || '-'}</td>
+    <td>${c.createdAt || '-'}</td>
+    <td>${isSuper ? `<button class="btn btn-sm btn-danger" onclick="deleteAuthCode('${c.code}')">删除</button>` : '-'}</td>
+  </tr>`).join('');
+}
+
+async function deleteAuthCode(code) {
+  if (!confirm('确定删除此授权码？')) return;
+  const data = await apiCall(`/api/auth-codes/${encodeURIComponent(code)}`, { method: 'DELETE' });
+  if (data.success) { showToast('已删除', 'success'); loadAuthCodes(); }
+  else showToast(data.error || '删除失败', 'error');
+}
+
+// ================================================================
+// 成员管理
+// ================================================================
+async function loadMembers() {
+  const currentUser = document.getElementById('currentUser').textContent;
+  // 仅超级管理员可创建超级管理员
+  document.getElementById('superRoleOpt').style.display =
+    document.getElementById('currentUser').textContent === 'admin' ? '' : 'none';
+
+  const data = await apiCall('/api/admins');
+  if (!data.success) return;
+  const tbody = document.getElementById('memBody');
+  tbody.innerHTML = (data.data || []).map(a => `<tr>
+    <td>${a.username}</td>
+    <td>${a.name || '-'}</td>
+    <td><span class="tag ${a.role === 'super' ? 'tag-blue' : 'tag-green'}">${a.role === 'super' ? '超级管理员' : '管理员'}</span></td>
+    <td style="font-family:monospace;font-size:13px;">${a.role === 'super' ? '🔒 保密' : a.password || '-'}</td>
+    <td>${a.createdAt || '-'}</td>
+    <td>${a.username !== currentUser ? `<button class="btn btn-sm btn-danger" onclick="deleteMember('${a.username}')">删除</button>` : '<span style="color:#ccc;font-size:12px;">当前账户</span>'}</td>
+  </tr>`).join('');
+}
+
+async function addMember() {
+  const username = document.getElementById('memUser').value.trim();
+  const name = document.getElementById('memName').value.trim();
+  const password = document.getElementById('memPass').value.trim();
+  const role = document.getElementById('memRole').value;
+  if (!username || !password) return showToast('账号和密码不能为空', 'error');
+  if (password.length < 6) return showToast('密码至少6位', 'error');
+  const data = await apiCall('/api/admins', {
+    method: 'POST',
+    body: JSON.stringify({ username, name: name || username, password, role }),
+  });
+  if (data.success) {
+    showToast('成员已添加', 'success');
+    document.getElementById('memUser').value = '';
+    document.getElementById('memName').value = '';
+    document.getElementById('memPass').value = '';
+    loadMembers();
+  } else showToast(data.error || '添加失败', 'error');
+}
+
+async function deleteMember(username) {
+  if (!confirm(`确定删除成员 ${username}？`)) return;
+  const data = await apiCall(`/api/admins/${username}`, { method: 'DELETE' });
+  if (data.success) { showToast('已删除', 'success'); loadMembers(); }
+  else showToast(data.error || '删除失败', 'error');
+}
+
+async function loadHistory() {
+  const search = document.getElementById('historySearch').value.trim().toLowerCase();
+  const data = await apiCall('/api/logs');
+  if (!data.success) return;
+  let logs = data.data || [];
+  if (search) {
+    logs = logs.filter(l =>
+      l.action?.toLowerCase().includes(search) ||
+      l.detail?.toLowerCase().includes(search) ||
+      l.operator?.toLowerCase().includes(search)
+    );
+  }
+  document.getElementById('historyStats').textContent = `共 ${logs.length} 条记录`;
+  const tbody = document.getElementById('historyBody');
+  if (logs.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state">暂无记录</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = logs.map(l => `<tr>
+    <td style="white-space:nowrap;">${l.time || '-'}</td>
+    <td><span class="tag tag-blue">${l.action || '-'}</span></td>
+    <td>${l.detail || '-'}</td>
+    <td>${l.operator || '-'}</td>
+  </tr>`).join('');
+}
+
+async function loadAdminPassword() {
+  const data = await apiCall('/api/admins');
+  if (!data.success) return;
+  const admin = (data.data || []).find(a => a.username === 'admin');
+  document.getElementById('adminPasswordDisplay').textContent = admin?.password || '未知';
+}
+</script>
+</body>
+</html>

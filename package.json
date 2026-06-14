@@ -1,0 +1,13 @@
+{
+  "name": "wentong-quality-admin-server",
+  "version": "1.0.0",
+  "description": "文安档案 · 商业授权管理系统",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.0"
+  }
+}
