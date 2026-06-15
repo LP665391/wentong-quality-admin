@@ -211,124 +211,136 @@
     }
 
     /* ============================================================
-       主界面
+       主界面 — Stripe 风格
        ============================================================ */
     .app { display: none; }
     .app-header {
-      background: #001529; color: #fff; padding: 0 24px; height: 56px;
+      background: #ffffff; color: #061b31; padding: 0 24px; height: 56px;
       display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #e5edf5;
     }
-    .app-header h1 { font-size: 18px; font-weight: 600; }
-    .app-header h1 span { color: #1677ff; }
-    .app-header .user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    .app-header h1 { font-size: 16px; font-weight: 400; color: #061b31; }
+    .app-header h1 span { color: #533afd; font-weight: 500; }
+    .app-header .user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 300; color: #64748d; }
     .app-header .user-info button {
-      padding: 6px 16px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px;
-      background: transparent; color: #fff; cursor: pointer; font-size: 13px;
+      padding: 6px 16px; border: 1px solid #e5edf5; border-radius: 4px;
+      background: #ffffff; color: #533afd; cursor: pointer; font-size: 13px; font-weight: 400;
+      font-family: inherit; transition: all .2s;
     }
-    .app-header .user-info button:hover { border-color: #fff; }
+    .app-header .user-info button:hover { border-color: #533afd; background: rgba(83, 58, 253, 0.05); }
 
-    .app-body { display: flex; min-height: calc(100vh - 56px); }
+    .app-body { display: flex; min-height: calc(100vh - 56px); background: #f8fafc; }
 
     /* -- 侧边栏 -- */
     .sidebar {
-      width: 220px; background: #fff; border-right: 1px solid #e8e8e8; padding: 16px 0;
+      width: 220px; background: #ffffff; border-right: 1px solid #e5edf5; padding: 16px 0;
     }
     .sidebar .menu-item {
-      padding: 12px 24px; cursor: pointer; font-size: 14px; color: #333;
+      padding: 10px 24px; cursor: pointer; font-size: 14px; font-weight: 300; color: #64748d;
       display: flex; align-items: center; gap: 10px; transition: all .2s;
+      border-left: 3px solid transparent;
     }
-    .sidebar .menu-item:hover { background: #f5f5f5; color: #1677ff; }
-    .sidebar .menu-item.active { background: #e6f4ff; color: #1677ff; font-weight: 600; border-right: 3px solid #1677ff; }
+    .sidebar .menu-item:hover { background: #f8fafc; color: #533afd; }
+    .sidebar .menu-item.active {
+      background: rgba(83, 58, 253, 0.05); color: #533afd; font-weight: 400;
+      border-left: 3px solid #533afd;
+    }
 
     /* -- 主内容 -- */
-    .main-content { flex: 1; padding: 24px; overflow-y: auto; }
-    .page-title { font-size: 20px; font-weight: 600; margin-bottom: 24px; color: #262626; }
-    .page-title small { font-size: 14px; font-weight: 400; color: #8c8c8c; margin-left: 8px; }
+    .main-content { flex: 1; padding: 32px; overflow-y: auto; }
+    .page-title { font-size: 24px; font-weight: 300; margin-bottom: 24px; color: #061b31; letter-spacing: -0.24px; }
+    .page-title small { font-size: 14px; font-weight: 300; color: #64748d; margin-left: 8px; }
 
     /* 统计卡片 */
     .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
     .stat-card {
-      background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      background: #ffffff; border-radius: 8px; padding: 20px;
+      border: 1px solid #e5edf5;
+      box-shadow: rgba(0, 0, 0, 0.04) 0px 2px 4px;
     }
-    .stat-card .num { font-size: 28px; font-weight: 700; color: #1677ff; }
-    .stat-card .num.green { color: #52c41a; }
-    .stat-card .num.orange { color: #fa8c16; }
-.stat-card .num.blue { color: #1677ff; }
-.stat-card .num.purple { color: #722ed1; }
-    .stat-card .label { font-size: 13px; color: #8c8c8c; margin-top: 4px; }
+    .stat-card .num { font-size: 28px; font-weight: 300; color: #533afd; letter-spacing: -0.56px; }
+    .stat-card .num.green { color: #10b981; }
+    .stat-card .num.orange { color: #f59e0b; }
+    .stat-card .num.blue { color: #533afd; }
+    .stat-card .num.purple { color: #8b5cf6; }
+    .stat-card .label { font-size: 13px; font-weight: 300; color: #64748d; margin-top: 4px; }
 
     /* 表单卡片 */
     .card {
-      background: #fff; border-radius: 12px; padding: 24px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 24px;
+      background: #ffffff; border-radius: 8px; padding: 24px;
+      border: 1px solid #e5edf5;
+      box-shadow: rgba(0, 0, 0, 0.04) 0px 2px 4px;
+      margin-bottom: 24px;
     }
-    .card h3 { font-size: 16px; margin-bottom: 20px; color: #262626; }
+    .card h3 { font-size: 16px; font-weight: 400; margin-bottom: 20px; color: #061b31; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
     .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
-    .form-group label { display: block; font-size: 13px; color: #595959; margin-bottom: 6px; font-weight: 500; }
+    .form-group label { display: block; font-size: 14px; color: #273951; margin-bottom: 6px; font-weight: 400; }
     .form-group input, .form-group select {
-      width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 6px;
-      font-size: 14px; outline: none; transition: border-color .2s;
+      width: 100%; padding: 10px 12px; border: 1px solid #e5edf5; border-radius: 4px;
+      font-size: 14px; font-weight: 300; color: #061b31; outline: none;
+      font-family: inherit; transition: border-color .2s, box-shadow .2s;
     }
-    .form-group input:focus { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
-    .form-group input[readonly] { background: #f5f5f5; color: #8c8c8c; }
-    .form-group .hint { font-size: 12px; color: #8c8c8c; margin-top: 4px; }
+    .form-group input:focus, .form-group select:focus { border-color: #533afd; box-shadow: 0 0 0 3px rgba(83, 58, 253, 0.1); }
+    .form-group input[readonly] { background: #f8fafc; color: #64748d; }
+    .form-group .hint { font-size: 12px; font-weight: 300; color: #64748d; margin-top: 4px; }
     .btn {
-      padding: 8px 24px; border: none; border-radius: 6px; font-size: 14px; font-weight: 500;
-      cursor: pointer; transition: all .2s;
+      padding: 10px 20px; border: none; border-radius: 4px; font-size: 14px; font-weight: 400;
+      cursor: pointer; transition: all .2s; font-family: inherit;
     }
-    .btn-primary { background: #1677ff; color: #fff; }
-    .btn-primary:hover { background: #4096ff; }
-    .btn-success { background: #52c41a; color: #fff; }
-    .btn-success:hover { background: #73d13d; }
-    .btn-danger { background: #ff4d4f; color: #fff; }
-    .btn-danger:hover { background: #ff7875; }
-    .btn-sm { padding: 4px 12px; font-size: 12px; }
+    .btn-primary { background: #533afd; color: #fff; box-shadow: rgba(50, 50, 93, 0.25) 0px 4px 8px -4px; }
+    .btn-primary:hover { background: #4434d4; box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -4px; }
+    .btn-success { background: #10b981; color: #fff; box-shadow: rgba(50, 50, 93, 0.25) 0px 4px 8px -4px; }
+    .btn-success:hover { background: #059669; }
+    .btn-danger { background: #ef4444; color: #fff; box-shadow: rgba(50, 50, 93, 0.25) 0px 4px 8px -4px; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-sm { padding: 6px 14px; font-size: 13px; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* 表格 */
     .table-wrap { overflow-x: auto; }
     table {
-      width: 100%; border-collapse: collapse; font-size: 13px;
+      width: 100%; border-collapse: collapse; font-size: 13px; font-weight: 300;
     }
     th {
-      background: #fafafa; padding: 12px 16px; text-align: left;
-      font-weight: 600; color: #595959; border-bottom: 1px solid #e8e8e8;
-      white-space: nowrap;
+      background: #f8fafc; padding: 12px 16px; text-align: left;
+      font-weight: 400; color: #64748d; border-bottom: 1px solid #e5edf5;
+      white-space: nowrap; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;
     }
     td {
-      padding: 10px 16px; border-bottom: 1px solid #f0f0f0; color: #333;
+      padding: 12px 16px; border-bottom: 1px solid #f1f5f9; color: #061b31;
     }
-    tr:hover td { background: #fafafa; }
+    tr:hover td { background: #f8fafc; }
     .tag {
-      display: inline-block; padding: 2px 8px; border-radius: 4px;
-      font-size: 12px; font-weight: 500;
+      display: inline-block; padding: 3px 10px; border-radius: 4px;
+      font-size: 12px; font-weight: 400;
     }
-    .tag-green { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
-    .tag-orange { background: #fff7e6; color: #fa8c16; border: 1px solid #ffd591; }
-    .tag-blue { background: #e6f4ff; color: #1677ff; border: 1px solid #91caff; }
+    .tag-green { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .tag-orange { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+    .tag-blue { background: rgba(83, 58, 253, 0.1); color: #533afd; }
     .empty-state {
-      text-align: center; padding: 48px; color: #8c8c8c; font-size: 14px;
+      text-align: center; padding: 48px; color: #64748d; font-size: 14px; font-weight: 300;
     }
 
     /* 提示消息 */
     .toast {
       position: fixed; top: 20px; right: 20px; z-index: 9999;
-      padding: 12px 20px; border-radius: 8px; font-size: 14px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      padding: 12px 20px; border-radius: 4px; font-size: 14px; font-weight: 400;
+      box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -4px;
       display: none; animation: slideIn .3s ease;
     }
-    .toast.success { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
-    .toast.error { background: #fff2f0; color: #ff4d4f; border: 1px solid #ffccc7; }
+    .toast.success { background: #ffffff; color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+    .toast.error { background: #ffffff; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
     /* 搜索栏 */
     .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .toolbar .search-box { display: flex; gap: 8px; align-items: center; }
     .toolbar .search-box input {
-      padding: 6px 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; outline: none; width: 240px;
+      padding: 8px 12px; border: 1px solid #e5edf5; border-radius: 4px; font-size: 13px; font-weight: 300; outline: none; width: 240px;
+      font-family: inherit; transition: border-color .2s;
     }
-    .toolbar .search-box input:focus { border-color: #1677ff; }
+    .toolbar .search-box input:focus { border-color: #533afd; }
 
     .hidden { display: none !important; }
 
@@ -336,7 +348,8 @@
     @media (max-width: 768px) {
       .app-body { flex-direction: column; }
       .sidebar { width: 100%; display: flex; overflow-x: auto; padding: 8px 0; }
-      .sidebar .menu-item { white-space: nowrap; padding: 8px 16px; }
+      .sidebar .menu-item { white-space: nowrap; padding: 8px 16px; border-left: none; border-bottom: 3px solid transparent; }
+      .sidebar .menu-item.active { border-left: none; border-bottom: 3px solid #533afd; }
       .stats { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
     }
@@ -499,12 +512,12 @@
           <h3>填写许可证信息</h3>
           <div class="form-row">
             <div class="form-group">
-              <label>机器码 <span style="color:#f56c6c">*</span></label>
+              <label>机器码 <span style="color:#ef4444">*</span></label>
               <input type="text" id="genMachineId" placeholder="格式：XXXX-XXXX-...（32位）">
               <div class="hint">用户桌面端「离线激活」页面可复制</div>
             </div>
             <div class="form-group">
-              <label>客户名称 <span style="color:#f56c6c">*</span></label>
+              <label>客户名称 <span style="color:#ef4444">*</span></label>
               <input type="text" id="genCustomer" placeholder="如：刘婷">
             </div>
           </div>
@@ -533,7 +546,7 @@
           </div>
           <div style="display:flex;gap:12px;">
             <button class="btn btn-primary" onclick="generateLicense()">生成并下载 .dat 许可证</button>
-            <button class="btn" style="border:1px solid #d9d9d9;background:#fff;color:#333;" onclick="clearForm()">清空</button>
+            <button class="btn" style="border:1px solid #e5edf5;background:#fff;color:#061b31;" onclick="clearForm()">清空</button>
           </div>
         </div>
 
@@ -570,7 +583,7 @@
           </div>
           <div style="display:flex;gap:12px;">
             <button class="btn btn-success" onclick="downloadLicense()">📥 下载 .dat 文件</button>
-            <button class="btn" style="border:1px solid #d9d9d9;background:#fff;color:#333;" onclick="copyLicenseData()">📋 复制许可证内容</button>
+            <button class="btn" style="border:1px solid #e5edf5;background:#fff;color:#061b31;" onclick="copyLicenseData()">📋 复制许可证内容</button>
           </div>
         </div>
       </div>
@@ -580,17 +593,17 @@
         <h2 class="page-title">关于</h2>
         <div class="card">
           <h3>文安档案 · 授权管理系统</h3>
-          <p style="color:#595959;line-height:2;margin-bottom:12px;">
+          <p style="color:#64748d;line-height:2;margin-bottom:12px;font-weight:300;">
             版本：v1.0.0<br>
             开发：连云港文安档案科技有限公司<br>
             用途：为 Ai质检平台 桌面端生成离线许可证文件<br>
             签名算法：HMAC-SHA256<br>
           </p>
-          <div style="background:#f6ffed;border:1px solid #b7eb8f;border-radius:8px;padding:12px 16px;margin-bottom:16px;">
-            <strong style="color:#52c41a;">🔑 超级管理员</strong><br>
-            <span style="color:#595959;font-size:14px;">
-              账号：<code style="background:#f0f0f0;padding:2px 8px;border-radius:4px;">admin</code><br>
-              密码：<code id="adminPasswordDisplay" style="background:#f0f0f0;padding:2px 8px;border-radius:4px;">加载中...</code>
+          <div style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.2);border-radius:4px;padding:12px 16px;margin-bottom:16px;">
+            <strong style="color:#10b981;">🔑 超级管理员</strong><br>
+            <span style="color:#64748d;font-size:14px;font-weight:300;">
+              账号：<code style="background:#f8fafc;padding:2px 8px;border-radius:4px;border:1px solid #e5edf5;">admin</code><br>
+              密码：<code id="adminPasswordDisplay" style="background:#f8fafc;padding:2px 8px;border-radius:4px;border:1px solid #e5edf5;">加载中...</code>
             </span>
           </div>
           <div class="form-group">
@@ -607,7 +620,7 @@
           <div class="toolbar">
             <h3 style="margin:0;font-size:16px;">📋 授权记录</h3>
             <div style="display:flex;gap:8px;align-items:center;">
-              <input type="text" id="searchInput" placeholder="搜索客户名/机器码..." oninput="renderRecords()" style="padding:6px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:13px;outline:none;width:200px;">
+              <input type="text" id="searchInput" placeholder="搜索客户名/机器码..." oninput="renderRecords()" style="padding:8px 12px;border:1px solid #e5edf5;border-radius:4px;font-size:13px;font-weight:300;outline:none;width:200px;font-family:inherit;">
               <button class="btn btn-sm btn-danger" onclick="clearAllRecords()" id="clearAllBtn" style="display:none;">清空所有</button>
             </div>
           </div>
@@ -638,7 +651,7 @@
           <h3>创建授权码（客户用于在线激活）</h3>
           <div class="form-row">
             <div class="form-group">
-              <label>客户名称 <span style="color:#f56c6c">*</span></label>
+              <label>客户名称 <span style="color:#ef4444">*</span></label>
               <input type="text" id="acCustomer" placeholder="如：刘婷">
             </div>
             <div class="form-group">
@@ -667,13 +680,13 @@
           <div class="toolbar">
             <div class="search-box">
               <input type="text" id="acSearch" placeholder="搜索授权码/客户..." oninput="loadAuthCodes()">
-              <select id="acFilter" onchange="loadAuthCodes()" style="padding:6px 8px;border:1px solid #d9d9d9;border-radius:6px;font-size:13px;">
+              <select id="acFilter" onchange="loadAuthCodes()" style="padding:8px 12px;border:1px solid #e5edf5;border-radius:4px;font-size:13px;font-weight:300;font-family:inherit;">
                 <option value="all">全部</option>
                 <option value="unused">未使用</option>
                 <option value="used">已使用</option>
               </select>
             </div>
-            <span style="font-size:13px;color:#8c8c8c;" id="acStats"></span>
+            <span style="font-size:13px;font-weight:300;color:#64748d;" id="acStats"></span>
           </div>
           <div class="table-wrap">
             <table>
@@ -693,7 +706,7 @@
               <input type="text" id="historySearch" placeholder="搜索操作内容..." oninput="loadHistory()">
               <button class="btn btn-sm btn-primary" onclick="loadHistory()">搜索</button>
             </div>
-            <span style="font-size:13px;color:#8c8c8c;" id="historyStats"></span>
+            <span style="font-size:13px;font-weight:300;color:#64748d;" id="historyStats"></span>
           </div>
           <div class="table-wrap">
             <table>
@@ -718,7 +731,7 @@
           <h3>添加成员</h3>
           <div class="form-row">
             <div class="form-group">
-              <label>账号 <span style="color:#f56c6c">*</span></label>
+              <label>账号 <span style="color:#ef4444">*</span></label>
               <input type="text" id="memUser" placeholder="登录账号">
             </div>
             <div class="form-group">
@@ -728,7 +741,7 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>密码 <span style="color:#f56c6c">*</span></label>
+              <label>密码 <span style="color:#ef4444">*</span></label>
               <div style="position:relative;">
                 <input type="password" id="memPass" placeholder="至少6位" style="padding-right:40px;">
                 <span onclick="toggleMemPass()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#999;font-size:16px;user-select:none;" id="memPassToggle">👁️</span>
@@ -975,7 +988,7 @@ async function refreshDashboard() {
       chart.innerHTML = trend.map(t => {
         const h = Math.max(4, (t.amount / max) * 70);
         return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
-          <div style="width:100%;background:#1677ff;border-radius:4px 4px 0 0;height:${h}px;transition:height .3s;min-height:4px;" title="¥${t.amount}"></div>
+          <div style="width:100%;background:#533afd;border-radius:4px 4px 0 0;height:${h}px;transition:height .3s;min-height:4px;" title="¥${t.amount}"></div>
           <span style="font-size:9px;color:#999;transform:rotate(-45deg);white-space:nowrap;">${t.month.slice(5)}</span>
         </div>`;
       }).join('');
@@ -1287,7 +1300,7 @@ async function loadAuthCodes() {
   document.getElementById('acStats').textContent = `共 ${total} 个，已使用 ${used} 个`;
 
   tbody.innerHTML = codes.map(c => `<tr>
-    <td><span style="font-family:monospace;font-size:12px;cursor:pointer;color:#1677ff;" onclick="copyText('${c.code}')" title="点击复制">${c.code || '-'}</span></td>
+    <td><span style="font-family:monospace;font-size:12px;cursor:pointer;color:#533afd;" onclick="copyText('${c.code}')" title="点击复制">${c.code || '-'}</span></td>
     <td>${c.customerName || '-'}</td>
     <td>${c.planId || '-'}</td>
     <td><span class="tag ${c.used ? 'tag-orange' : 'tag-green'}">${c.used ? '已使用' : '未使用'}</span></td>
