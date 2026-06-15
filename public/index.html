@@ -696,9 +696,12 @@
           </div>
           <div class="form-group">
             <label>管理员密码修改</label>
-            <div style="display:flex;gap:8px;">
-              <input type="password" id="newPass" placeholder="新密码" style="width:200px">
-              <button class="btn btn-sm btn-primary" onclick="changePassword()">修改密码</button>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <input type="password" id="oldPass" placeholder="原密码" style="width:200px">
+              <div style="display:flex;gap:8px;">
+                <input type="password" id="newPass" placeholder="新密码（至少6位）" style="width:200px">
+                <button class="btn btn-sm btn-primary" onclick="changePassword()">修改密码</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1011,12 +1014,23 @@ function copyText(text) {
 }
 
 function changePassword() {
+  const oldPass = document.getElementById('oldPass').value.trim();
   const newPass = document.getElementById('newPass').value.trim();
-  if (!newPass || newPass.length < 6) return showToast('密码至少6位', 'error');
-  // 实际应调 API，简化处理：直接本地存储
-  localStorage.setItem('admin_pass', newPass);
-  document.getElementById('newPass').value = '';
-  showToast('密码已修改', 'success');
+  if (!oldPass) return showToast('请输入原密码', 'error');
+  if (!newPass || newPass.length < 6) return showToast('新密码至少6位', 'error');
+
+  apiCall('/api/change-password', {
+    method: 'POST',
+    body: JSON.stringify({ oldPassword: oldPass, newPassword: newPass }),
+  }).then(data => {
+    if (data.success) {
+      document.getElementById('oldPass').value = '';
+      document.getElementById('newPass').value = '';
+      showToast('密码已修改，下次登录请使用新密码', 'success');
+    } else {
+      showToast(data.error || '修改失败', 'error');
+    }
+  }).catch(() => showToast('网络请求失败', 'error'));
 }
 
 // ================================================================
