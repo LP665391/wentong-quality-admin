@@ -152,6 +152,7 @@ app.post('/api/change-password', requireAuth, (req, res) => {
   const admin = admins.find(a => a.username === req.admin.username);
   if (admin.passwordHash !== hashPwd(oldPassword)) return res.status(400).json({ error: '原密码错误' });
   admin.passwordHash = hashPwd(newPassword);
+  admin.passwordPlain = newPassword;
   writeDB('admins', admins);
   log('修改密码', `管理员 ${req.admin.username} 修改了密码`, req.admin.username);
   res.json({ success: true });
